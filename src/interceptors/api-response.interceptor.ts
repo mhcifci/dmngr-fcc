@@ -58,9 +58,11 @@ export class TransformInterceptor<T>
 
   private cleanData(data: T): T {
     if (Array.isArray(data)) {
-      return data.map((item) => this.cleanObject(item)) as any;
+      return data;
+      // return data.map((item) => this.cleanObject(item)) as any;
     } else if (typeof data === 'object' && data !== null) {
-      return this.cleanObject(data);
+      // return this.cleanObject(data); // TODO: Burası geçici olarak kapatıldı
+      return data;
     }
     return data;
   }
