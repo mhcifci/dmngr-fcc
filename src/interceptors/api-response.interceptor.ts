@@ -64,6 +64,7 @@ export class TransformInterceptor<T>
       const cleanedData: any = { ...data };
       delete cleanedData.id;
       delete cleanedData.userId;
+      delete cleanedData.hash;
       return cleanedData;
     }
     return data;
