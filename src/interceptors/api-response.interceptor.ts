@@ -7,7 +7,7 @@ import {
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-export interface Response<T> {
+export interface ApiResponse<T> {
   statusCode: number;
   message: string;
   data: T;
@@ -15,20 +15,18 @@ export interface Response<T> {
 
 @Injectable()
 export class TransformInterceptor<T>
-  implements NestInterceptor<T, Response<T>>
+  implements NestInterceptor<T, ApiResponse<T>>
 {
   intercept(
     context: ExecutionContext,
     next: CallHandler,
-  ): Observable<Response<T>> {
+  ): Observable<ApiResponse<T>> {
     return next.handle().pipe(
       map((data) => {
-        const response: Response<T> = {
-          statusCode: this.getStatusCode(data, context),
-          message: this.getMessage(data, context),
-          data: data,
-        };
-        return response;
+        const statusCode = this.getStatusCode(data, context);
+        const message = this.getMessage(data, statusCode);
+        const cleanedData = this.cleanData(data);
+        return { statusCode, message, data: cleanedData };
       }),
     );
   }
@@ -36,28 +34,38 @@ export class TransformInterceptor<T>
   private getStatusCode(data: T, context: ExecutionContext): number {
     const response = context.switchToHttp().getResponse();
     if (!data) {
-      return 500;
+      return 500; // Internal Server Error
     } else if (typeof data === 'object' && 'status' in data) {
       return (data as any).status;
     } else {
-      return response.statusCode || 400;
+      return response.statusCode || 200; // Default to 200 OK
     }
   }
 
-  private getMessage(data: T, context: ExecutionContext): string {
-    const response = context.switchToHttp().getResponse();
+  private getMessage(data: T, statusCode: number): string {
     if (!data) {
       return 'Failed';
-    } else if (response.statusCode < 202) {
+    } else if (statusCode < 300) {
       return 'Success';
-    } else if (response.statusCode < 400) {
+    } else if (statusCode < 400) {
       return 'Redirected';
-    } else if (response.statusCode > 400) {
-      return 'Failed';
-    } else if (typeof data === 'object' && 'message' in data) {
-      return (data as any).message;
+    } else if (statusCode < 500) {
+      return 'Client Error';
     } else {
-      return '';
+      return 'Server Error';
     }
+  }
+
+  private cleanData(data: T): T {
+    if (
+      typeof data === 'object' &&
+      ('id' in data || 'userId' in data || 'hash' in data)
+    ) {
+      const cleanedData: any = { ...data };
+      delete cleanedData.id;
+      delete cleanedData.userId;
+      return cleanedData;
+    }
+    return data;
   }
 }
