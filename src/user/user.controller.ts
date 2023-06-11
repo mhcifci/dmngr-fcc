@@ -14,7 +14,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { TransformInterceptor } from 'src/interceptors/api-response.interceptor';
 
 @UseGuards(JwtGuard)
-@UseInterceptors(TransformInterceptor)
 @Controller('users')
 export class UserController {
   constructor(private userService: UserService) {}
