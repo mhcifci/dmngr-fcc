@@ -34,7 +34,7 @@ model Domain {
 
   title       String
   description String?
-  url         String
+  url         String  @unique
   isBanned    Boolean @default(false)
 
   userId Int

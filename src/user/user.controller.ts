@@ -1,17 +1,9 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Patch,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';
 import { JwtGuard } from 'src/auth/guard';
 import { UserService } from './user.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { TransformInterceptor } from 'src/interceptors/api-response.interceptor';
 
 @UseGuards(JwtGuard)
 @Controller('users')
