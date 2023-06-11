@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DomainService } from './domain.service';
-import { CreateDomainDto, GetDomainDto } from './dto';
+import { CreateDomainDto } from './dto';
 import { JwtGuard } from 'src/auth/guard';
 import { User } from '@prisma/client';
 import { GetUser } from 'src/auth/decorator';

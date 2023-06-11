@@ -57,14 +57,13 @@ export class TransformInterceptor<T>
   }
 
   private cleanData(data: T): T {
-    if (
-      typeof data === 'object' &&
-      ('id' in data || 'userId' in data || 'hash' in data)
-    ) {
+    if (typeof data === 'object' && ('id' in data || 'userId' in data)) {
       const cleanedData: any = { ...data };
       delete cleanedData.id;
       delete cleanedData.userId;
-      delete cleanedData.hash;
+      if ('hash' in cleanedData) {
+        delete cleanedData.hash;
+      }
       return cleanedData;
     }
     return data;
