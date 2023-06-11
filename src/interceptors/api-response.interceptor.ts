@@ -57,15 +57,19 @@ export class TransformInterceptor<T>
   }
 
   private cleanData(data: T): T {
-    if (typeof data === 'object' && ('id' in data || 'userId' in data)) {
-      const cleanedData: any = { ...data };
-      delete cleanedData.id;
-      delete cleanedData.userId;
-      if ('hash' in cleanedData) {
-        delete cleanedData.hash;
-      }
-      return cleanedData;
+    if (Array.isArray(data)) {
+      return data.map((item) => this.cleanObject(item)) as any;
+    } else if (typeof data === 'object' && data !== null) {
+      return this.cleanObject(data);
     }
     return data;
+  }
+
+  private cleanObject(obj: any): any {
+    const cleanedObj: any = { ...obj };
+    delete cleanedObj.userId;
+    delete cleanedObj.id;
+    delete cleanedObj.hash;
+    return cleanedObj;
   }
 }
